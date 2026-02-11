@@ -50,7 +50,7 @@ const QuoteModal = ({ isOpen, onClose }) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -63,28 +63,28 @@ const QuoteModal = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-2xl bg-graphite border border-white/10 rounded-3xl overflow-hidden"
+                        className="relative w-full max-w-2xl bg-graphite border border-white/10 rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
                         {success ? (
-                            <div className="p-20 text-center flex flex-col items-center gap-6">
+                            <div className="p-12 md:p-20 text-center flex flex-col items-center gap-6">
                                 <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="w-20 h-20 bg-accent rounded-full flex items-center justify-center text-primary"
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-accent rounded-full flex items-center justify-center text-primary"
                                 >
-                                    <CheckCircle2 size={40} />
+                                    <CheckCircle2 size={32} md={40} />
                                 </motion.div>
-                                <h2 className="text-3xl font-black">Request Sent!</h2>
-                                <p className="text-off-white/40">We'll get back to you with a professional quote shortly.</p>
+                                <h2 className="text-2xl md:text-3xl font-black">Request Sent!</h2>
+                                <p className="text-sm md:text-base text-off-white/40">We'll get back to you with a professional quote shortly.</p>
                             </div>
                         ) : (
                             <>
-                                <div className="flex justify-between items-center p-8 border-b border-white/5">
-                                    <h2 className="text-2xl font-black tracking-tight">Request a <span className="text-accent">Quote</span></h2>
-                                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors"><X /></button>
+                                <div className="flex justify-between items-center p-6 md:p-8 border-b border-white/5 shrink-0">
+                                    <h2 className="text-xl md:text-2xl font-black tracking-tight">Request a <span className="text-accent">Quote</span></h2>
+                                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors"><X size={20} md={24} /></button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+                                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-accent">Full Name</label>

@@ -42,7 +42,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -55,29 +55,29 @@ const ReviewModal = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-lg bg-graphite border border-white/10 rounded-3xl overflow-hidden"
+                        className="relative w-full max-w-lg bg-graphite border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
                         {success ? (
-                            <div className="p-20 text-center flex flex-col items-center gap-6">
+                            <div className="p-12 md:p-20 text-center flex flex-col items-center gap-6">
                                 <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="w-20 h-20 bg-accent rounded-full flex items-center justify-center text-primary"
+                                    className="w-16 h-16 md:w-20 md:h-20 bg-accent rounded-full flex items-center justify-center text-primary"
                                 >
-                                    <CheckCircle2 size={40} />
+                                    <CheckCircle2 size={32} md={40} />
                                 </motion.div>
-                                <h2 className="text-3xl font-black">Feedback Received!</h2>
-                                <p className="text-off-white/40">Your review has been submitted for moderation. Thank you!</p>
+                                <h2 className="text-2xl md:text-3xl font-black">Feedback Received!</h2>
+                                <p className="text-sm md:text-base text-off-white/40">Your review has been submitted for moderation. Thank you!</p>
                             </div>
                         ) : (
                             <>
-                                <div className="flex justify-between items-center p-8 border-b border-white/5">
-                                    <h2 className="text-xl font-black tracking-tight">Share Your <span className="text-accent">Experience</span></h2>
-                                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors"><X /></button>
+                                <div className="flex justify-between items-center p-6 md:p-8 border-b border-white/5 shrink-0">
+                                    <h2 className="text-lg md:text-xl font-black tracking-tight">Share Your <span className="text-accent">Experience</span></h2>
+                                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors"><X size={20} md={24} /></button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                                    <div className="grid md:grid-cols-2 gap-6">
+                                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black uppercase tracking-widest text-accent">Your Name</label>
                                             <input
@@ -101,15 +101,15 @@ const ReviewModal = ({ isOpen, onClose }) => {
 
                                     <div className="space-y-4">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-accent block">Rating</label>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 justify-center md:justify-start">
                                             {[1, 2, 3, 4, 5].map(star => (
                                                 <button
                                                     key={star}
                                                     type="button"
                                                     onClick={() => setFormData({ ...formData, rating: star })}
-                                                    className={`p-2 transition-colors ${formData.rating >= star ? 'text-accent' : 'text-white/10'}`}
+                                                    className={`p-1.5 md:p-2 transition-colors ${formData.rating >= star ? 'text-accent' : 'text-white/10'}`}
                                                 >
-                                                    <Star size={24} fill={formData.rating >= star ? 'currentColor' : 'none'} />
+                                                    <Star size={20} md={24} fill={formData.rating >= star ? 'currentColor' : 'none'} />
                                                 </button>
                                             ))}
                                         </div>
