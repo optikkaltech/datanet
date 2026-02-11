@@ -7,6 +7,7 @@ import { db } from '../../lib/firebase';
 
 const Testimonials = () => {
     const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
@@ -23,8 +24,10 @@ const Testimonials = () => {
                 reviewsData.push({ id: doc.id, ...doc.data() });
             });
             setReviews(reviewsData);
+            setLoading(false);
         }, (error) => {
             console.error('Firestore Fetch Error:', error);
+            setLoading(false);
         });
 
         return () => unsubscribe();
@@ -66,24 +69,41 @@ const Testimonials = () => {
 
                 <div className="max-w-4xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 lg:gap-24">
-                        {displayReviews.map((t, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: i * 0.2 }}
-                                className="flex flex-col gap-8 p-8 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all duration-500"
-                            >
-                                <div className="w-12 h-1 bg-accent" />
-                                <p className="text-2xl md:text-3xl font-light italic leading-relaxed text-off-white/80">
-                                    "{t.content}"
-                                </p>
-                                <div>
-                                    <h4 className="text-lg font-bold text-accent tracking-wide">{t.name}</h4>
-                                    <p className="text-sm text-off-white/40 uppercase tracking-widest">{t.company}</p>
+                        {loading ? (
+                            // Skeleton Screens
+                            [1, 2, 3, 4].map((n) => (
+                                <div key={n} className="flex flex-col gap-8 p-8 rounded-2xl bg-white/[0.01] border border-white/5 animate-pulse">
+                                    <div className="w-12 h-1 bg-white/5" />
+                                    <div className="space-y-4">
+                                        <div className="h-6 bg-white/5 rounded w-full" />
+                                        <div className="h-6 bg-white/5 rounded w-5/6" />
+                                    </div>
+                                    <div className="space-y-2 pt-4">
+                                        <div className="h-4 bg-white/5 rounded w-1/3" />
+                                        <div className="h-3 bg-white/5 rounded w-1/4" />
+                                    </div>
                                 </div>
-                            </motion.div>
-                        ))}
+                            ))
+                        ) : (
+                            displayReviews.map((t, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: i * 0.2 }}
+                                    className="flex flex-col gap-8 p-8 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all duration-500"
+                                >
+                                    <div className="w-12 h-1 bg-accent" />
+                                    <p className="text-2xl md:text-3xl font-light italic leading-relaxed text-off-white/80">
+                                        "{t.content}"
+                                    </p>
+                                    <div>
+                                        <h4 className="text-lg font-bold text-accent tracking-wide">{t.name}</h4>
+                                        <p className="text-sm text-off-white/40 uppercase tracking-widest">{t.company}</p>
+                                    </div>
+                                </motion.div>
+                            ))
+                        )}
                     </div>
                 </div>
 

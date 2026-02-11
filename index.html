@@ -4,7 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/jpeg" href="/images/logo.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
   <title>Datanet Global | Elite IT & Security Infrastructure Solutions UK</title>
   <meta name="description"
     content="Datanet Global Limited delivers professional IT infrastructure, networking, and advanced security systems. UK-based experts in Cisco, Ubiquiti, and surveillance integration." />
@@ -53,7 +56,39 @@
 </head>
 
 <body class="bg-primary">
-  <div id="root"></div>
+  <div id="root">
+    <!-- Instant CSS Loader before JS loads -->
+    <style>
+      .initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #0A0A0A;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+      }
+
+      .loader-spin {
+        width: 40px;
+        height: 40px;
+        border: 2px solid rgba(212, 175, 55, 0.1);
+        border-top-color: #D4AF37;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <div class="initial-loader">
+      <div class="loader-spin"></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

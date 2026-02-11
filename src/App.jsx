@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import SEO from './components/utils/SEO';
+import Preloader from './components/utils/Preloader';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
 const MainLayout = () => {
@@ -28,6 +29,7 @@ const MainLayout = () => {
 
   return (
     <div className="relative bg-primary overflow-x-hidden">
+      <Preloader />
       <SEO
         title="Home"
         description="Datanet Global Limited delivers professional IT infrastructure, networking, and advanced security systems in the UK. Certified experts in Cisco and surveillance integration."
