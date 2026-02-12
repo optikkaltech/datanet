@@ -44,6 +44,21 @@ const Footer = () => {
                         <Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link>
                     </div>
                 </div>
+
+                <div className="pt-8 mt-8 border-t border-white/5 flex flex-col items-center gap-4 text-[10px] uppercase tracking-[0.2em] font-medium text-off-white/30">
+                    <p>
+                        Developed by <a href="https://optikkaltech.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">Optikkaltech.com</a>
+                    </p>
+                    <a
+                        href="https://wa.me/2348055139724?text=Hello%20Optikkaltech,%20I%20saw%20your%20work%20on%20Datanet%20Global%20and%20I%20would%20like%20your%20to%20discuss%20a%20project%20with%20you"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 hover:text-accent transition-colors"
+                    >
+                        <Phone size={12} />
+                        Chat on WhatsApp
+                    </a>
+                </div>
             </div>
         </footer>
     );
