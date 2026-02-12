@@ -9,7 +9,7 @@ const products = [
         id: 1,
         name: "Enterprise Laptop Fleet",
         category: "Laptops",
-        price: "From £899",
+        // price: "From £899",
         image: "/images/laptop.png",
         features: ["Core i7/i9 Processors", "32GB RAM", "1TB SSD", "Enterprise Security"],
         icon: <Cpu size={20} />
@@ -18,7 +18,7 @@ const products = [
         id: 2,
         name: "4K IP Surveillance System",
         category: "CCTV Cameras",
-        price: "From £1,299",
+        // price: "From £1,299",
         image: "/images/cctv.png",
         features: ["4K Resolution", "Night Vision", "AI Motion Detection", "Weatherproof"],
         icon: <ShieldCheck size={20} />
@@ -27,7 +27,7 @@ const products = [
         id: 3,
         name: "Network Video Recorders",
         category: "NVR Systems",
-        price: "From £499",
+        // price: "From £499",
         image: "/images/nvr_system.png",
         features: ["16-Channel Recording", "Remote Access", "4TB Storage", "H.265+ Compression"],
         icon: <HardDrive size={20} />
@@ -36,7 +36,7 @@ const products = [
         id: 4,
         name: "Smart Office Networking",
         category: "Networking",
-        price: "Custom Quote",
+        // price: "Custom Quote",
         image: "/images/smart.png",
         features: ["Wi-Fi 6 Mesh", "Cloud Management", "IoT Ready", "Secure Guest Access"],
         icon: <Wifi size={20} />
@@ -45,7 +45,7 @@ const products = [
         id: 5,
         name: "Rackmount Servers",
         category: "Servers",
-        price: "Custom Configure",
+        // price: "Custom Configure",
         image: "/images/server.png",
         features: ["Xeon Scalable CPUs", "Redundant Power", "Hot-Swap Drive Bays", "Remote Mgmt"],
         icon: <Server size={20} />
@@ -54,7 +54,7 @@ const products = [
         id: 6,
         name: "Ultra-Wide Monitors",
         category: "Displays",
-        price: "From £450",
+        // price: "From £450",
         image: "/images/monitor.png",
         features: ["34-inch Curved", "IPS Panel", "USB-C Docking", "Color Accurate"],
         icon: <Monitor size={20} />
@@ -63,7 +63,7 @@ const products = [
         id: 7,
         name: "Biometric Access Control",
         category: "Security",
-        price: "From £2,500",
+        // price: "From £2,500",
         image: "/images/access_control.png",
         features: ["Fingerprint/Face ID", "RFID Integration", "Time & Attendance", "Anti-Passback"],
         icon: <Lock size={20} />
@@ -72,7 +72,7 @@ const products = [
         id: 8,
         name: "Enterprise UPS Systems",
         category: "Power",
-        price: "From £350",
+        // price: "From £350",
         image: "/images/cps.png", // Abstract tech/power image
         features: ["Battery Backup", "Surge Protection", "Voltage Regulation", "LCD Design"],
         icon: <Battery size={20} />
@@ -81,7 +81,7 @@ const products = [
         id: 9,
         name: "Conference Room Solutions",
         category: "AV Systems",
-        price: "Custom Quote",
+        // price: "Custom Quote",
         image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?q=80&w=2525&auto=format&fit=crop",
         features: ["4K Video Bars", "Wireless Casting", "Touch Controllers", "Acoustic Treatment"],
         icon: <Monitor size={20} />
@@ -90,7 +90,7 @@ const products = [
         id: 10,
         name: "Firewall Appliances",
         category: "Cybersecurity",
-        price: "From £699",
+        // price: "From £699",
         image: "/images/firewalls.png",
         features: ["Next-Gen Threat Prevention", "VPN Gateway", "Deep Packet Inspection", "SD-WAN"],
         icon: <ShieldCheck size={20} />
@@ -99,7 +99,7 @@ const products = [
         id: 11,
         name: "System Repair & Maintenance",
         category: "Services",
-        price: "From £80/hr",
+        // price: "From £80/hr",
         image: "/images/repair.png",
         features: ["Hardware Diagnostics", "Component Replacement", "Data Recovery", "Software Troubleshooting"],
         icon: <Wrench size={20} />
@@ -173,7 +173,7 @@ const Sales = () => {
                                     <div className="flex justify-between items-start mb-6">
                                         <div>
                                             <h3 className="text-xl font-bold mb-2 group-hover:text-accent transition-colors line-clamp-1">{product.name}</h3>
-                                            <p className="text-lg font-light text-off-white/80">{product.price}</p>
+                                            {/* <p className="text-lg font-light text-off-white/80">{product.price}</p> */}
                                         </div>
                                         <div className="p-3 bg-white/5 rounded-xl text-accent/80 shrink-0">
                                             {product.icon}
