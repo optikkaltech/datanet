@@ -31,8 +31,8 @@ const Footer = () => {
                     </div>
 
                     <div className="flex gap-6">
-                        <a href="https://facebook.com/profile.php?id=100063688220038" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Facebook size={18} /></a>
-                        <a href="https://instagram.com/datanetglobal2012" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Instagram size={18} /></a>
+                        <a href="https://facebook.com/datanetgloballimited" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Facebook size={18} /></a>
+                        <a href="https://instagram.com/datanetgloballimited" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Instagram size={18} /></a>
                         <a href="https://wa.me/447586352447" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Phone size={18} /></a>
                     </div>
                 </div>
