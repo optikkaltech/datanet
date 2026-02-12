@@ -22,7 +22,7 @@ const Industries = () => {
                     {Array(4).fill(industries).flat().map((industry, i) => (
                         <span
                             key={i}
-                            className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white/10 hover:text-accent/40 transition-colors cursor-default"
+                            className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-white/30 hover:text-accent/60 transition-colors cursor-default"
                         >
                             {industry}
                         </span>

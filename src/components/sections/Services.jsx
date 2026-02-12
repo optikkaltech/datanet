@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Network, ShieldCheck, Headphones, Settings, ArrowUpRight } from 'lucide-react';
+import { Network, ShieldCheck, Headphones, Settings, ArrowUpRight, ShoppingBag } from 'lucide-react';
 import ServiceDetailModal from './ServiceDetailModal';
 
+import { useNavigate } from 'react-router-dom';
+
 const services = [
+    {
+        title: "Product Sales",
+        description: "Official retailer for enterprise hardware including Laptops, CCTV Cameras, and Networking equipment.",
+        longDescription: "We supply certified enterprise-grade hardware from top manufacturers. From high-performance laptops for your workforce to advanced security camera systems, we ensure you get the best equipment for your needs.",
+        icon: <ShoppingBag size={32} />,
+        tags: ["Laptops", "CCTV Cameras", "Networking Gear"],
+        isLink: true,
+        path: "/sales",
+        features: [
+            { title: "Enterprise Laptops", desc: "Dell, HP, and Lenovo workstations for business." },
+            { title: "Surveillance Gear", desc: "4K IP Cameras, NVRs, and DVR systems." },
+            { title: "Networking", desc: "Routers, Switches, and Access Points." },
+            { title: "Warranty Support", desc: "Full manufacturer warranty on all products." }
+        ]
+    },
     {
         title: "IT & Network Solutions",
         description: "Comprehensive infrastructure design, structured cabling, and enterprise connectivity for modern businesses.",
@@ -61,15 +78,21 @@ const services = [
 const Services = () => {
     const [selectedService, setSelectedService] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const handleOpenDetail = (service) => {
-        setSelectedService(service);
-        setIsModalOpen(true);
+    const handleAction = (service) => {
+        if (service.isLink) {
+            navigate(service.path);
+        } else {
+            setSelectedService(service);
+            setIsModalOpen(true);
+        }
     };
 
     return (
         <section id="services" className="section-padding bg-graphite/30">
             <div className="container mx-auto">
+                {/* ... (Header remains same) */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
                     <div className="max-w-2xl">
                         <span className="text-accent text-xs font-black tracking-[0.3em] uppercase mb-6 block">Our Expertise</span>
@@ -83,7 +106,7 @@ const Services = () => {
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-1">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1">
                     {services.map((service, i) => (
                         <motion.div
                             key={i}
@@ -91,7 +114,8 @@ const Services = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
                             viewport={{ once: true }}
-                            className="group relative p-10 bg-primary/40 border border-white/5 hover:bg-accent/[0.03] transition-all duration-500 overflow-hidden"
+                            className="group relative p-10 bg-primary/40 border border-white/5 hover:bg-accent/[0.03] transition-all duration-500 overflow-hidden cursor-pointer"
+                            onClick={() => handleAction(service)}
                         >
                             {/* Hover highlight line */}
                             <div className="absolute top-0 left-0 w-0 h-1 bg-accent group-hover:w-full transition-all duration-700" />
@@ -116,10 +140,9 @@ const Services = () => {
                             </div>
 
                             <button
-                                onClick={() => handleOpenDetail(service)}
                                 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] group-hover:gap-4 transition-all opacity-40 group-hover:opacity-100"
                             >
-                                Learn More <ArrowUpRight size={14} className="text-accent" />
+                                {service.isLink ? 'View Products' : 'Learn More'} <ArrowUpRight size={14} className="text-accent" />
                             </button>
                         </motion.div>
                     ))}

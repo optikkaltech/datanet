@@ -79,7 +79,7 @@ const LegalPrivacy = () => {
                             <h2 className="text-2xl font-bold text-off-white mb-4 italic">6. Contact Us</h2>
                             <p>
                                 If you have any questions about this Privacy Policy, please contact us at:<br />
-                                <span className="text-accent mt-2 block">legal@datanetglobal.com.uk</span>
+                                <span className="text-accent mt-2 block">legal@datanetglobal.co.uk</span>
                             </p>
                         </section>
                     </div>

@@ -57,7 +57,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <h4 className="text-xs uppercase tracking-widest text-off-white/40 mb-1">Email Us</h4>
-                                    <p className="text-xl font-medium">contact@datanetglobal.com.uk</p>
+                                    <p className="text-xl font-medium">contact@datanetglobal.co.uk</p>
                                 </div>
                             </div>
 
@@ -77,7 +77,7 @@ const Contact = () => {
                                 </div>
                                 <div>
                                     <h4 className="text-xs uppercase tracking-widest text-off-white/40 mb-1">Our Office</h4>
-                                    <p className="text-xl font-medium">Lagos, Nigeria</p>
+                                    <p className="text-xl font-medium">Swinley Gardens, Newcastle Upon Tyne. United Kingdom</p>
                                 </div>
                             </div>
                         </div>

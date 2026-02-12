@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Magnetic from '../utils/Magnetic';
 
 const Navbar = ({ onGetStarted }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -22,6 +25,35 @@ const Navbar = ({ onGetStarted }) => {
         { name: 'Contact', href: '#contact' },
     ];
 
+    const handleNavClick = (e, href) => {
+        e.preventDefault();
+        setMobileMenuOpen(false);
+
+        if (location.pathname !== '/') {
+            navigate('/');
+            setTimeout(() => {
+                const element = document.querySelector(href);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        } else {
+            const element = document.querySelector(href);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    };
+
+    const handleLogoClick = () => {
+        if (location.pathname !== '/') {
+            navigate('/');
+            window.scrollTo(0, 0);
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     return (
         <nav
             className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${isScrolled ? 'py-4 bg-primary/80 backdrop-blur-md border-b border-white/5' : 'py-8 bg-transparent'
@@ -33,6 +65,7 @@ const Navbar = ({ onGetStarted }) => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="group cursor-pointer"
+                    onClick={handleLogoClick}
                 >
                     <Magnetic strength={0.2}>
                         <div className="flex items-center gap-3">
@@ -43,7 +76,7 @@ const Navbar = ({ onGetStarted }) => {
                                     className="w-full h-full object-contain rounded-full border border-accent/20"
                                 />
                             </div>
-                            <span className="text-xl font-black tracking-tighter uppercase hidden sm:block">Datanet<span className="text-accent">Global</span></span>
+                            <span className="text-xl font-black tracking-tighter uppercase">Datanet<span className="text-accent">Global</span></span>
                         </div>
                     </Magnetic>
                 </motion.div>
@@ -54,10 +87,11 @@ const Navbar = ({ onGetStarted }) => {
                         <motion.a
                             key={link.name}
                             href={link.href}
+                            onClick={(e) => handleNavClick(e, link.href)}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
-                            className="text-sm font-medium tracking-widest uppercase hover:text-accent transition-colors"
+                            className="text-sm font-medium tracking-widest uppercase hover:text-accent transition-colors cursor-pointer"
                         >
                             {link.name}
                         </motion.a>
@@ -97,7 +131,7 @@ const Navbar = ({ onGetStarted }) => {
                                     key={link.name}
                                     href={link.href}
                                     className="text-lg font-medium tracking-widest uppercase"
-                                    onClick={() => setMobileMenuOpen(false)}
+                                    onClick={(e) => handleNavClick(e, link.href)}
                                 >
                                     {link.name}
                                 </a>

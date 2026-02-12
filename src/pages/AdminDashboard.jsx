@@ -224,7 +224,7 @@ const AdminDashboard = () => {
                 <header className="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12">
                     <div>
                         <h2 className="text-3xl md:text-4xl font-black capitalize mb-2">{activeTab.replace('-', ' ')}</h2>
-                        <p className="text-off-white/40 text-xs md:text-sm">Real-time data from datanetglobal.com.uk</p>
+                        <p className="text-off-white/40 text-xs md:text-sm">Real-time data from datanetglobal.co.uk</p>
                     </div>
                     <div className="flex gap-2 md:gap-4 overflow-x-auto pb-2 md:pb-0">
                         <button className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-50 whitespace-nowrap"><Calendar size={14} /> Last 30 Days</button>

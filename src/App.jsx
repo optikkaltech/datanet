@@ -11,7 +11,9 @@ import Testimonials from './components/sections/Testimonials';
 import Contact from './components/sections/Contact';
 import Footer from './components/layout/Footer';
 import QuoteModal from './components/sections/QuoteModal';
+import SalesBanner from './components/sections/SalesBanner';
 import AdminDashboard from './pages/AdminDashboard';
+import Sales from './pages/Sales';
 import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import SEO from './components/utils/SEO';
@@ -47,6 +49,7 @@ const MainLayout = () => {
 
       <main>
         <Hero onOpenQuote={() => setIsQuoteModalOpen(true)} />
+        <SalesBanner />
         <About />
         <Services />
         <Values />
@@ -72,6 +75,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/sales" element={<Sales />} />
         <Route path="/privacy" element={<LegalPrivacy />} />
         <Route path="/terms" element={<LegalTerms />} />
       </Routes>
