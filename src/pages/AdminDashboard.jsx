@@ -21,12 +21,16 @@ import {
     onSnapshot,
     doc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    getDoc,
+    setDoc,
+    serverTimestamp
 } from 'firebase/firestore';
 import {
     signInWithEmailAndPassword,
     onAuthStateChanged,
-    signOut
+    signOut,
+    updatePassword
 } from 'firebase/auth';
 import { db, auth } from '../lib/firebase';
 import SEO from '../components/utils/SEO';
@@ -37,23 +41,41 @@ const AdminDashboard = () => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAuth, setIsAuth] = useState(false);
+    const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
     const [loginData, setLoginData] = useState({ email: '', password: '' });
+    const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [changeLoading, setChangeLoading] = useState(false);
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Check if user needs to change password
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const userSnap = await getDoc(userRef);
+
+                    if (!userSnap.exists() || userSnap.data().requiresPasswordChange) {
+                        setNeedsPasswordChange(true);
+                    } else {
+                        setNeedsPasswordChange(false);
+                        startSubmissionsListener();
+                        startReviewsListener();
+                    }
+                } catch (error) {
+                    console.error("User check redirected (Normal for 1st time login):", error);
+                    // If we can't read the users collection, it's likely because the user record 
+                    // doesn't exist yet (permission error on non-existent doc with standard rules).
+                    // We treat this as a first-time login.
+                    setNeedsPasswordChange(true);
+                }
+
                 setIsAuth(true);
-                const subUnsubscribe = startSubmissionsListener();
-                const revUnsubscribe = startReviewsListener();
                 setLoading(false);
-                return () => {
-                    subUnsubscribe();
-                    revUnsubscribe();
-                };
             } else {
                 setIsAuth(false);
                 setLoading(false);
+                setNeedsPasswordChange(false);
             }
         });
 
@@ -79,7 +101,26 @@ const AdminDashboard = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
+            const userCredential = await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
+            const user = userCredential.user;
+
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists() || userSnap.data().requiresPasswordChange) {
+                    setNeedsPasswordChange(true);
+                } else {
+                    setNeedsPasswordChange(false);
+                    startSubmissionsListener();
+                    startReviewsListener();
+                }
+            } catch (error) {
+                console.warn("Redirecting for first-time setup:", error);
+                // Default to password change if document is missing or inaccessible
+                setNeedsPasswordChange(true);
+            }
+            setIsAuth(true);
         } catch (error) {
             console.error('Login Error:', error);
             alert('Invalid credentials or Firebase Auth not configured properly.');
@@ -97,6 +138,36 @@ const AdminDashboard = () => {
 
     const handleLogout = async () => {
         await signOut(auth);
+    };
+
+    const handlePasswordUpdate = async (e) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+        if (passwordData.newPassword.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+        }
+
+        setChangeLoading(true);
+        try {
+            await updatePassword(auth.currentUser, passwordData.newPassword);
+            await setDoc(doc(db, 'users', auth.currentUser.uid), {
+                requiresPasswordChange: false,
+                updatedAt: serverTimestamp()
+            });
+            setNeedsPasswordChange(false);
+            startSubmissionsListener();
+            startReviewsListener();
+            alert("Password updated successfully!");
+        } catch (error) {
+            console.error("Error updating password:", error);
+            alert("Error updating password. You may need to log out and log in again to do this.");
+        } finally {
+            setChangeLoading(false);
+        }
     };
 
     if (loading) return <div className="min-h-screen bg-primary flex items-center justify-center text-accent">Loading...</div>;
@@ -135,6 +206,70 @@ const AdminDashboard = () => {
                             />
                         </div>
                         <button className="btn-primary w-full py-5">Login to Dashboard</button>
+                    </form>
+                </motion.div>
+            </div>
+        );
+    }
+
+    if (needsPasswordChange) {
+        return (
+            <div className="min-h-screen bg-primary flex items-center justify-center p-6">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-full max-w-md bg-graphite border border-white/5 rounded-3xl p-10 shadow-2xl"
+                >
+                    <div className="text-center mb-10">
+                        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <User className="text-accent" size={32} />
+                        </div>
+                        <h1 className="text-2xl font-black mb-2">Security <span className="text-accent">Update</span></h1>
+                        <p className="text-off-white/40 text-sm">Please set a new password for your first time login.</p>
+                    </div>
+
+                    <form onSubmit={handlePasswordUpdate} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">New Password</label>
+                            <input
+                                required
+                                type="password"
+                                className="form-input"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                placeholder="Min. 6 characters"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">Confirm Password</label>
+                            <input
+                                required
+                                type="password"
+                                className="form-input"
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                placeholder="Repeat password"
+                            />
+                        </div>
+
+                        <div className="pt-4 space-y-4">
+                            <button
+                                type="submit"
+                                disabled={changeLoading}
+                                className="btn-primary w-full py-5 flex items-center justify-center gap-3 disabled:opacity-50"
+                            >
+                                {changeLoading ? 'Updating...' : 'Set New Password'}
+                                {!changeLoading && <ChevronRight size={18} />}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-off-white/20 hover:text-off-white/60 transition-colors"
+                            >
+                                Cancel and Logout
+                            </button>
+                        </div>
                     </form>
                 </motion.div>
             </div>
