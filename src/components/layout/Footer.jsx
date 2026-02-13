@@ -38,7 +38,7 @@ const Footer = () => {
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between pt-12 border-t border-white/5 text-[10px] uppercase tracking-[0.3em] font-medium text-off-white/20">
-                    <p>© since 2009 to {new Date().getFullYear()} Datanet Global Limited. All Rights Reserved.</p>
+                    <p>© since 2009 to {new Date().getFullYear()} DatanetGlobal. All Rights Reserved.</p>
                     <div className="flex gap-8 mt-6 md:mt-0">
                         <Link to="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link>
@@ -46,18 +46,9 @@ const Footer = () => {
                 </div>
 
                 <div className="pt-8 mt-8 border-t border-white/5 flex flex-col items-center gap-4 text-[10px] uppercase tracking-[0.2em] font-medium text-off-white/30">
-                    <p>
-                        Developed by <a href="https://optikkaltech.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">Optikkaltech.com</a>
+                    <p className="text-accent">
+                        Developed by DatanetGlobal
                     </p>
-                    <a
-                        href="https://wa.me/2348055139724?text=Hello%20Optikkaltech,%20I%20saw%20your%20work%20on%20Datanet%20Global%20and%20I%20would%20like%20your%20to%20discuss%20a%20project%20with%20you"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 hover:text-accent transition-colors"
-                    >
-                        <Phone size={12} />
-                        Chat on WhatsApp
-                    </a>
                 </div>
             </div>
         </footer>

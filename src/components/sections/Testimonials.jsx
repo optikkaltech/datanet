@@ -110,9 +110,24 @@ const Testimonials = () => {
                 <ReviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
                 {/* Client Logos / Trust Signals */}
-                <div className="mt-32 pt-16 border-t border-white/5 flex flex-wrap justify-center gap-16 md:gap-32 grayscale opacity-40 hover:grayscale-0 transition-all duration-700">
-                    {['CISCO', 'SAMSUNG', 'DELL', 'DAHUA', 'HIKVISION'].map(brand => (
-                        <span key={brand} className="text-xl font-black tracking-tighter">{brand}</span>
+                <div className="mt-32 pt-16 border-t border-white/5 flex flex-wrap justify-center gap-12 md:gap-24 grayscale hover:grayscale-0 transition-all duration-700">
+                    {[
+                        { name: 'CISCO', logo: 'https://cdn.simpleicons.org/cisco' },
+                        { name: 'SAMSUNG', logo: 'https://cdn.simpleicons.org/samsung' },
+                        { name: 'DELL', logo: 'https://cdn.simpleicons.org/dell' },
+                        { name: 'DAHUA', logo: '/images/dahuatech.svg' },
+                        { name: 'HIKVISION', logo: '/images/hikvision.png' }
+                    ].map(brand => (
+                        <div key={brand.name} className="flex items-center gap-3 group">
+                            <img
+                                src={brand.logo}
+                                alt={`${brand.name} logo`}
+                                className="h-8 w-auto object-contain brightness-0 invert group-hover:brightness-100 group-hover:invert-0 transition-all duration-300"
+                            />
+                            <span className="text-xl font-black tracking-tighter text-off-white group-hover:text-white transition-colors">
+                                {brand.name}
+                            </span>
+                        </div>
                     ))}
                 </div>
             </div>
