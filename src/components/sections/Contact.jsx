@@ -9,6 +9,7 @@ const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        phone: '',
         service: '',
         message: ''
     });
@@ -26,7 +27,7 @@ const Contact = () => {
             });
 
             setSuccess(true);
-            setFormData({ name: '', email: '', service: '', message: '' });
+            setFormData({ name: '', email: '', phone: '', service: '', message: '' });
             setTimeout(() => setSuccess(false), 5000);
         } catch (error) {
             console.error('Error submitting message:', error);
@@ -123,20 +124,33 @@ const Contact = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-accent">Service Required</label>
-                                    <select
-                                        required
-                                        className="form-input bg-primary appearance-none"
-                                        value={formData.service}
-                                        onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                                    >
-                                        <option value="">Select a service</option>
-                                        <option>IT & Network Solutions</option>
-                                        <option>Security & CCTV</option>
-                                        <option>Managed Services</option>
-                                        <option>System Repair</option>
-                                    </select>
+                                <div className="grid md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-accent">Phone Number</label>
+                                        <input
+                                            required
+                                            type="tel"
+                                            placeholder="+44 123 456 789"
+                                            className="form-input"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-accent">Service Required</label>
+                                        <select
+                                            required
+                                            className="form-input bg-primary appearance-none"
+                                            value={formData.service}
+                                            onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                                        >
+                                            <option value="">Select a service</option>
+                                            <option>IT & Network Solutions</option>
+                                            <option>Security & CCTV</option>
+                                            <option>Managed Services</option>
+                                            <option>System Repair</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
