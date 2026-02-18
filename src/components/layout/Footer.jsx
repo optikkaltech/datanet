@@ -1,5 +1,5 @@
 import React from 'react';
-import { Instagram, Facebook, Phone } from 'lucide-react';
+import { Instagram, Facebook, Phone, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -34,6 +34,7 @@ const Footer = () => {
                         <a href="https://www.facebook.com/share/1BYZC5MoR2/?mibextid=wwXIfr" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Facebook size={18} /></a>
                         <a href="https://www.instagram.com/oke.jeremiah.71?igsh=N2Jvbm1zaDVpZmk1" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Instagram size={18} /></a>
                         <a href="https://wa.me/447586352447" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Phone size={18} /></a>
+                        <a href="https://www.linkedin.com/in/datanet-global-limited-7965993b1/" target="_blank" rel="noreferrer" className="p-3 bg-graphite rounded-full hover:bg-accent hover:text-primary transition-all duration-300"><Linkedin size={18} /></a>
                     </div>
                 </div>
 
