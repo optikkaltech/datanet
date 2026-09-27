@@ -12,31 +12,63 @@ import {
     Shield,
     Sparkles,
     ChevronDown,
-    MessageCircle
+    MessageCircle,
+    Laptop,
+    Camera,
+    Wifi,
+    Server
 } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { Link } from 'react-router-dom';
 
-const defaultSuggestions = [
-    'cctv system',
-    'cctv surveillance system',
-    'cctv camera system',
-    'cctv security system',
-    'cctv camera security system',
-    'wireless cctv system',
-    'hd cctv camera security system',
-    'wireless cctv camera system',
-    'cctv dvr system',
-    'cctv monitoring system',
-    'cctv installation & maintenance',
-    'dell latitude business laptop',
-    'hp elitebook g6 / x360 laptop',
-    'enterprise laptop fleet (bulk order)',
-    'cisco network switches & wifi 6',
-    'biometric access control & time attendance',
-    'dell poweredge server & ups backup'
+const serviceGroups = [
+    {
+        category: 'CCTV & Security Solutions',
+        icon: <Camera size={13} className="text-accent" />,
+        items: [
+            'CCTV System (Complete Setup)',
+            '4K UHD IP CCTV Cameras',
+            'Wireless CCTV Camera System',
+            'CCTV Installation & Maintenance',
+            'NVR & 24/7 Remote Smartphone Viewing',
+            'Commercial CCTV Site Survey'
+        ]
+    },
+    {
+        category: 'Business Laptops & Fleets',
+        icon: <Laptop size={13} className="text-accent" />,
+        items: [
+            'Dell Latitude Business Laptop',
+            'HP EliteBook G6 / x360 Touchscreen',
+            'HP Elite Dragonfly Ultra-light',
+            'Dell Latitude 2-in-1 Touchscreen',
+            'Enterprise Laptop Fleet (Bulk 5-50+ Units)'
+        ]
+    },
+    {
+        category: 'Networking & Cloud Infrastructure',
+        icon: <Wifi size={13} className="text-accent" />,
+        items: [
+            'Cisco Catalyst Switches & Meraki',
+            'Business WiFi 6 & Mesh Setup',
+            'Structured Network Cabling (Cat6/Cat6A)',
+            'Cybersecurity, Firewall & VPN Defense'
+        ]
+    },
+    {
+        category: 'Servers, Access Control & Power',
+        icon: <Server size={13} className="text-accent" />,
+        items: [
+            'Dell PowerEdge Enterprise Servers',
+            'Biometric Access Control & Time Attendance',
+            'APC Smart-UPS Power Backup',
+            'Managed IT Support & PC Repair'
+        ]
+    }
 ];
+
+const allFlatSuggestions = serviceGroups.flatMap(g => g.items);
 
 const countries = [
     { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', prefix: '+44' },
@@ -58,10 +90,11 @@ const QuoteModal = ({ isOpen, onClose, prefilledService = '' }) => {
     const [agreedToTerms, setAgreedToTerms] = useState(true);
     const [additionalNotes, setAdditionalNotes] = useState('');
     
-    // Autocomplete State
+    // Autocomplete & Browse State
     const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
-    const [filteredSuggestions, setFilteredSuggestions] = useState(defaultSuggestions);
+    const [forceShowAll, setForceShowAll] = useState(false);
     const suggestionsRef = useRef(null);
+    const inputRef = useRef(null);
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -72,16 +105,20 @@ const QuoteModal = ({ isOpen, onClose, prefilledService = '' }) => {
         }
     }, [prefilledService]);
 
-    // Handle suggestion filtering
-    useEffect(() => {
-        if (!productName.trim()) {
-            setFilteredSuggestions(defaultSuggestions);
-        } else {
-            const query = productName.toLowerCase();
-            const matches = defaultSuggestions.filter(item => item.toLowerCase().includes(query));
-            setFilteredSuggestions(matches.length > 0 ? matches : defaultSuggestions.slice(0, 5));
+    // Group-based filtering
+    const displayedGroups = serviceGroups.map(group => {
+        if (forceShowAll || !productName.trim()) {
+            return group;
         }
-    }, [productName]);
+        const query = productName.toLowerCase();
+        const filteredItems = group.items.filter(item =>
+            item.toLowerCase().includes(query) || group.category.toLowerCase().includes(query)
+        );
+        return {
+            ...group,
+            items: filteredItems
+        };
+    }).filter(group => group.items.length > 0);
 
     // Close suggestion box on outside click
     useEffect(() => {
@@ -252,50 +289,151 @@ const QuoteModal = ({ isOpen, onClose, prefilledService = '' }) => {
                                     </div>
 
                                     <form onSubmit={handleSubmit} className="space-y-4">
-                                        {/* Product / Service Name (with Autocomplete) */}
+                                        {/* Product / Service Name (with Autocomplete & Full Categorized Directory) */}
                                         <div className="relative">
-                                            <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
-                                                Enter Product/Service name <span className="text-red-400">*</span>
-                                            </label>
-                                            <div className="relative">
+                                            <div className="flex items-center justify-between mb-1.5">
+                                                <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60">
+                                                    Enter Product/Service name <span className="text-red-400">*</span>
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setForceShowAll(true);
+                                                        setIsSuggestionsOpen(!isSuggestionsOpen);
+                                                    }}
+                                                    className="text-[10px] text-accent hover:text-accent-light transition-colors font-bold uppercase tracking-wider cursor-pointer"
+                                                >
+                                                    {isSuggestionsOpen ? 'Close Menu' : 'Browse All Services (18)'}
+                                                </button>
+                                            </div>
+
+                                            <div className="relative flex items-center">
+                                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none">
+                                                    <Search size={14} />
+                                                </div>
+
                                                 <input
+                                                    ref={inputRef}
                                                     required
                                                     type="text"
                                                     value={productName}
                                                     onChange={(e) => {
                                                         setProductName(e.target.value);
+                                                        setForceShowAll(false);
                                                         setIsSuggestionsOpen(true);
                                                     }}
                                                     onFocus={() => setIsSuggestionsOpen(true)}
-                                                    placeholder="e.g. CCTV System, Laptop Fleet, WiFi Setup..."
-                                                    className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl px-4 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
+                                                    placeholder="Type or select (e.g. CCTV, HP EliteBook, Cisco...)"
+                                                    className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl pl-10 pr-20 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
                                                 />
-                                                <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none" />
+
+                                                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                                    {/* Quick 1-click Clear Button */}
+                                                    {productName && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setProductName('');
+                                                                setForceShowAll(true);
+                                                                setIsSuggestionsOpen(true);
+                                                                inputRef.current?.focus();
+                                                            }}
+                                                            title="Clear text to see full list"
+                                                            className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-off-white/70 hover:text-white transition-colors cursor-pointer"
+                                                        >
+                                                            <X size={13} />
+                                                        </button>
+                                                    )}
+
+                                                    {/* Dropdown Chevron Toggle */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setForceShowAll(true);
+                                                            setIsSuggestionsOpen(!isSuggestionsOpen);
+                                                        }}
+                                                        className="p-1 rounded-md hover:bg-white/10 text-off-white/50 hover:text-white transition-colors cursor-pointer"
+                                                    >
+                                                        <ChevronDown size={15} className={`transition-transform duration-200 ${isSuggestionsOpen ? 'rotate-180 text-accent' : ''}`} />
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            {/* Autocomplete Suggestions Dropdown */}
+                                            {/* Autocomplete & Directory Dropdown */}
                                             <AnimatePresence>
                                                 {isSuggestionsOpen && (
                                                     <motion.div
                                                         initial={{ opacity: 0, y: -5 }}
                                                         animate={{ opacity: 1, y: 0 }}
                                                         exit={{ opacity: 0, y: -5 }}
-                                                        className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-graphite border border-white/15 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scrollbar p-1"
+                                                        className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-graphite border border-white/15 rounded-2xl shadow-2xl max-h-64 overflow-y-auto custom-scrollbar p-2"
                                                     >
-                                                        {filteredSuggestions.map((item, index) => (
-                                                            <button
-                                                                key={index}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setProductName(item);
-                                                                    setIsSuggestionsOpen(false);
-                                                                }}
-                                                                className="w-full text-left px-3.5 py-2 rounded-lg text-xs text-off-white/80 hover:text-white hover:bg-accent/15 hover:border-accent/30 transition-colors flex items-center gap-2 cursor-pointer"
-                                                            >
-                                                                <Search size={12} className="text-accent/70 shrink-0" />
-                                                                <span className="capitalize">{item}</span>
-                                                            </button>
-                                                        ))}
+                                                        {/* Top quick banner */}
+                                                        <div className="px-2.5 py-1.5 mb-1 text-[10px] uppercase font-black tracking-wider text-off-white/40 flex items-center justify-between border-b border-white/5">
+                                                            <span>{forceShowAll ? 'All Datanet Hardware & Services' : `Matching Results (${displayedGroups.reduce((acc, g) => acc + g.items.length, 0)})`}</span>
+                                                            {!forceShowAll && productName && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setForceShowAll(true)}
+                                                                    className="text-accent hover:underline lowercase font-sans text-[11px]"
+                                                                >
+                                                                    show all
+                                                                </button>
+                                                            )}
+                                                        </div>
+
+                                                        {displayedGroups.length === 0 ? (
+                                                            <div className="p-4 text-center">
+                                                                <p className="text-xs text-off-white/60">
+                                                                    No direct match for "<span className="text-accent">{productName}</span>"
+                                                                </p>
+                                                                <p className="text-[11px] text-off-white/40 mt-1">
+                                                                    You can keep typing for a custom request, or browse all below:
+                                                                </p>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setForceShowAll(true)}
+                                                                    className="mt-2.5 px-3 py-1.5 bg-accent/15 border border-accent/30 text-accent text-xs font-bold rounded-lg hover:bg-accent hover:text-primary transition-colors cursor-pointer"
+                                                                >
+                                                                    Show All Available Services
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-3 pt-1">
+                                                                {displayedGroups.map((group, gIdx) => (
+                                                                    <div key={gIdx} className="space-y-1">
+                                                                        <div className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-accent/80 flex items-center gap-1.5 bg-white/5 rounded-md">
+                                                                            {group.icon}
+                                                                            <span>{group.category}</span>
+                                                                        </div>
+                                                                        <div className="space-y-0.5 pl-1">
+                                                                            {group.items.map((item, itemIdx) => {
+                                                                                const isSelected = productName.toLowerCase() === item.toLowerCase();
+                                                                                return (
+                                                                                    <button
+                                                                                        key={itemIdx}
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            setProductName(item);
+                                                                                            setIsSuggestionsOpen(false);
+                                                                                            setForceShowAll(false);
+                                                                                        }}
+                                                                                        className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                                                                                            isSelected
+                                                                                                ? 'bg-accent text-primary font-bold shadow-md shadow-accent/20'
+                                                                                                : 'text-off-white/80 hover:text-white hover:bg-white/10'
+                                                                                        }`}
+                                                                                    >
+                                                                                        <span className="truncate">{item}</span>
+                                                                                        {isSelected && <CheckCircle2 size={13} className="shrink-0" />}
+                                                                                    </button>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
