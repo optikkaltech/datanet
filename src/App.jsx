@@ -18,6 +18,7 @@ import LegalPrivacy from './pages/LegalPrivacy';
 import LegalTerms from './pages/LegalTerms';
 import SEO from './components/utils/SEO';
 import Preloader from './components/utils/Preloader';
+import FloatingQuoteButton from './components/utils/FloatingQuoteButton';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
 const MainLayout = () => {
@@ -28,6 +29,8 @@ const MainLayout = () => {
     damping: 30,
     restDelta: 0.001
   });
+
+  const handleOpenQuote = () => setIsQuoteModalOpen(true);
 
   return (
     <div className="relative bg-primary overflow-x-hidden">
@@ -45,11 +48,14 @@ const MainLayout = () => {
       {/* Background Noise/Overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100] bg-noise"></div>
 
-      <Navbar onGetStarted={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} />
+      <Navbar
+        onOpenQuote={handleOpenQuote}
+        onGetStarted={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+      />
 
       <main>
-        <Hero onOpenQuote={() => setIsQuoteModalOpen(true)} />
-        <SalesBanner />
+        <Hero onOpenQuote={handleOpenQuote} />
+        <SalesBanner onOpenQuote={handleOpenQuote} />
         <About />
         <Services />
         <Values />
@@ -60,6 +66,8 @@ const MainLayout = () => {
       </main>
 
       <Footer />
+
+      <FloatingQuoteButton onClick={handleOpenQuote} />
 
       <QuoteModal
         isOpen={isQuoteModalOpen}

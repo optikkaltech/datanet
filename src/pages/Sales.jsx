@@ -21,9 +21,12 @@ import {
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import SEO from '../components/utils/SEO';
+import QuoteModal from '../components/sections/QuoteModal';
+import FloatingQuoteButton from '../components/utils/FloatingQuoteButton';
 import { allProducts, laptopProducts, cctvProducts, networkingProducts, enterpriseHardware } from '../data/productsData';
 
 const Sales = () => {
+    const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedBrand, setSelectedBrand] = useState('All');
@@ -131,7 +134,7 @@ const Sales = () => {
                 title="Hardware Store & Laptop Inventory | Datanet Global"
                 description="Browse Datanet's certified business laptops (Dell Latitude, HP EliteBook, Dragonfly), 4K CCTV surveillance systems, Cisco networking switches, and enterprise servers."
             />
-            <Navbar />
+            <Navbar onOpenQuote={() => setIsQuoteModalOpen(true)} />
 
             <main className="pt-32 pb-24">
                 <div className="container mx-auto px-6 md:px-12 lg:px-20">
@@ -478,15 +481,23 @@ const Sales = () => {
                             <p className="text-off-white/60 mb-8 leading-relaxed text-sm md:text-base font-light">
                                 If you need customized RAM/SSD upgrades, specialized surveillance cameras, or Cisco enterprise switches not listed here, our team sources and prepares custom configurations within 24-48 hours.
                             </p>
-                            <a
-                                href="https://wa.me/447586352447?text=Hello%20Datanet%20Global,%20I%20need%20a%20custom%20hardware%20configuration."
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-primary font-bold uppercase tracking-widest text-xs rounded-xl hover:bg-accent-light transition-all shadow-xl shadow-accent/10"
-                            >
-                                Contact Enterprise Sales
-                                <ArrowRight size={16} />
-                            </a>
+                            <div className="flex flex-wrap gap-4">
+                                <button
+                                    onClick={() => setIsQuoteModalOpen(true)}
+                                    className="inline-flex items-center gap-3 px-8 py-4 bg-accent text-primary font-black uppercase tracking-widest text-xs rounded-xl hover:bg-accent-light transition-all shadow-xl shadow-accent/10 cursor-pointer"
+                                >
+                                    Request Custom Quote
+                                    <ArrowRight size={16} />
+                                </button>
+                                <a
+                                    href="https://wa.me/447586352447?text=Hello%20Datanet%20Global,%20I%20need%20a%20custom%20hardware%20configuration."
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all"
+                                >
+                                    WhatsApp Sales
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -599,6 +610,13 @@ const Sales = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            <FloatingQuoteButton onClick={() => setIsQuoteModalOpen(true)} />
+
+            <QuoteModal
+                isOpen={isQuoteModalOpen}
+                onClose={() => setIsQuoteModalOpen(false)}
+            />
 
             <Footer />
         </div>

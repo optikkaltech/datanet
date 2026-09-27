@@ -4,7 +4,7 @@ import { ShoppingBag, ArrowRight, Cpu, HardDrive, Monitor, ShieldCheck, CheckCir
 import { useNavigate } from 'react-router-dom';
 import { laptopProducts, cctvProducts, networkingProducts, enterpriseHardware } from '../../data/productsData';
 
-const SalesBanner = () => {
+const SalesBanner = ({ onOpenQuote }) => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('all');
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -255,18 +255,16 @@ const SalesBanner = () => {
                     <div className="flex flex-wrap gap-4 shrink-0">
                         <button
                             onClick={() => navigate('/sales')}
-                            className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all"
+                            className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all cursor-pointer"
                         >
                             Open Hardware Store
                         </button>
-                        <a
-                            href="https://wa.me/447586352447?text=Hello%20Datanet%20Global,%20I%20would%20like%20a%20bulk%20laptop/hardware%20quote."
-                            target="_blank"
-                            rel="noreferrer"
-                            className="btn-primary rounded-xl"
+                        <button
+                            onClick={onOpenQuote ? onOpenQuote : () => window.open("https://wa.me/447586352447?text=Hello%20Datanet%20Global,%20I%20would%20like%20a%20bulk%20laptop/hardware%20quote.", "_blank")}
+                            className="btn-primary rounded-xl cursor-pointer"
                         >
-                            Get Bulk Quote
-                        </a>
+                            Request Quote
+                        </button>
                     </div>
                 </motion.div>
             </div>

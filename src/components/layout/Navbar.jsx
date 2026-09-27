@@ -4,11 +4,24 @@ import { Menu, X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Magnetic from '../utils/Magnetic';
 
-const Navbar = ({ onGetStarted }) => {
+const Navbar = ({ onGetStarted, onOpenQuote }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+
+    const handleQuoteClick = () => {
+        if (onOpenQuote) {
+            onOpenQuote();
+        } else if (onGetStarted) {
+            onGetStarted();
+        } else {
+            const element = document.querySelector('#contact');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -89,7 +102,7 @@ const Navbar = ({ onGetStarted }) => {
                 </motion.div>
 
                 {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-12">
+                <div className="hidden md:flex items-center gap-10">
                     {navLinks.map((link, i) => (
                         <motion.a
                             key={link.name}
@@ -107,17 +120,23 @@ const Navbar = ({ onGetStarted }) => {
                         <motion.button
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="px-6 py-2 border border-accent text-accent text-xs font-bold uppercase tracking-widest hover:bg-accent hover:text-primary transition-all duration-300"
-                            onClick={onGetStarted}
+                            className="px-6 py-2.5 bg-accent text-primary text-xs font-black uppercase tracking-widest hover:bg-accent-light transition-all duration-300 rounded-xl shadow-lg shadow-accent/20 flex items-center gap-2 cursor-pointer"
+                            onClick={handleQuoteClick}
                         >
-                            Get Started
+                            Request Quote
                         </motion.button>
                     </Magnetic>
                 </div>
 
                 {/* Mobile Toggle */}
-                <div className="md:hidden">
-                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <div className="md:hidden flex items-center gap-3">
+                    <button
+                        onClick={handleQuoteClick}
+                        className="px-3.5 py-1.5 bg-accent text-primary text-[11px] font-black uppercase tracking-wider rounded-lg"
+                    >
+                        Quote
+                    </button>
+                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
                         {mobileMenuOpen ? <X className="text-accent" /> : <Menu className="text-accent" />}
                     </button>
                 </div>
@@ -143,6 +162,15 @@ const Navbar = ({ onGetStarted }) => {
                                     {link.name}
                                 </a>
                             ))}
+                            <button
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    handleQuoteClick();
+                                }}
+                                className="w-full py-3.5 bg-accent text-primary text-xs font-black uppercase tracking-widest rounded-xl mt-2 text-center"
+                            >
+                                Request a Quote
+                            </button>
                         </div>
                     </motion.div>
                 )}
