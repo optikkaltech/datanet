@@ -1,36 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, CheckCircle2 } from 'lucide-react';
-import Magnetic from '../utils/Magnetic';
+import {
+    X,
+    Send,
+    CheckCircle2,
+    Mail,
+    User,
+    Phone,
+    Globe,
+    Search,
+    Shield,
+    Sparkles,
+    ChevronDown,
+    MessageCircle
+} from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { Link } from 'react-router-dom';
 
-const QuoteModal = ({ isOpen, onClose }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        service: '',
-        message: '',
-        budget: ''
-    });
+const defaultSuggestions = [
+    'cctv system',
+    'cctv surveillance system',
+    'cctv camera system',
+    'cctv security system',
+    'cctv camera security system',
+    'wireless cctv system',
+    'hd cctv camera security system',
+    'wireless cctv camera system',
+    'cctv dvr system',
+    'cctv monitoring system',
+    'cctv installation & maintenance',
+    'dell latitude business laptop',
+    'hp elitebook g6 / x360 laptop',
+    'enterprise laptop fleet (bulk order)',
+    'cisco network switches & wifi 6',
+    'biometric access control & time attendance',
+    'dell poweredge server & ups backup'
+];
+
+const countries = [
+    { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', prefix: '+44' },
+    { code: 'US', name: 'United States', flag: '🇺🇸', prefix: '+1' },
+    { code: 'CA', name: 'Canada', flag: '🇨🇦', prefix: '+1' },
+    { code: 'IE', name: 'Ireland', flag: '🇮🇪', prefix: '+353' },
+    { code: 'NG', name: 'Nigeria', flag: '🇳🇬', prefix: '+234' },
+    { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', prefix: '+971' },
+    { code: 'EU', name: 'Other European Union', flag: '🇪🇺', prefix: '+' }
+];
+
+const QuoteModal = ({ isOpen, onClose, prefilledService = '' }) => {
+    const [productName, setProductName] = useState(prefilledService || 'CCTV System');
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+    const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(true);
+    const [additionalNotes, setAdditionalNotes] = useState('');
+    
+    // Autocomplete State
+    const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+    const [filteredSuggestions, setFilteredSuggestions] = useState(defaultSuggestions);
+    const suggestionsRef = useRef(null);
+
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    useEffect(() => {
+        if (prefilledService) {
+            setProductName(prefilledService);
+        }
+    }, [prefilledService]);
+
+    // Handle suggestion filtering
+    useEffect(() => {
+        if (!productName.trim()) {
+            setFilteredSuggestions(defaultSuggestions);
+        } else {
+            const query = productName.toLowerCase();
+            const matches = defaultSuggestions.filter(item => item.toLowerCase().includes(query));
+            setFilteredSuggestions(matches.length > 0 ? matches : defaultSuggestions.slice(0, 5));
+        }
+    }, [productName]);
+
+    // Close suggestion box on outside click
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+                setIsSuggestionsOpen(false);
+                setIsCountryDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!agreedToTerms) {
+            alert('Please agree to the terms and privacy policy to continue.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            // Save data to Firestore (without file_path)
             await addDoc(collection(db, 'submissions'), {
-                type: 'quote',
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-                service: formData.service,
-                message: formData.message,
-                budget: formData.budget,
+                type: 'enquiry',
+                product_service: productName,
+                name,
+                email,
+                phone: phone ? `${selectedCountry.prefix} ${phone}` : '',
+                country: selectedCountry.name,
+                country_code: selectedCountry.code,
+                notes: additionalNotes,
+                status: 'new',
                 created_at: serverTimestamp()
             });
 
@@ -38,142 +122,350 @@ const QuoteModal = ({ isOpen, onClose }) => {
             setTimeout(() => {
                 setSuccess(false);
                 onClose();
+                setName('');
+                setEmail('');
+                setPhone('');
+                setAdditionalNotes('');
             }, 3000);
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Error submitting form');
+            console.error('Error submitting enquiry:', error);
+            alert('Error submitting enquiry. Please try again or message us on WhatsApp.');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleWhatsAppSubmit = () => {
+        let msg = `Hello Datanet Global, I would like to request an enquiry/quote for: *${productName || 'CCTV & IT Systems'}*`;
+        if (name) msg += `\n- *Name:* ${name}`;
+        if (email) msg += `\n- *Email:* ${email}`;
+        if (phone) msg += `\n- *Phone:* ${phone}`;
+        msg += `\n- *Country:* ${selectedCountry.name}`;
+        if (additionalNotes) msg += `\n- *Requirement:* ${additionalNotes}`;
+        msg += `\n\nPlease provide quotation and availability details.`;
+        window.open(`https://wa.me/447586352447?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    // Determine visual preview on the left side
+    const isLaptop = productName.toLowerCase().includes('laptop') || productName.toLowerCase().includes('hp') || productName.toLowerCase().includes('dell');
+    const previewImage = isLaptop ? '/images/laptops/dell_latitude_7420.jpg' : '/images/cctv.png';
+    const previewTitle = isLaptop ? 'Looking for Business Laptops?' : 'Looking for CCTV System?';
+
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+                    {/* Dark Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-primary/90 backdrop-blur-md"
+                        className="fixed inset-0 bg-black/85 backdrop-blur-md"
                     />
 
+                    {/* Modal Card */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-2xl bg-graphite border border-white/10 rounded-3xl overflow-hidden flex flex-col max-h-[90vh]"
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        transition={{ duration: 0.25 }}
+                        className="relative w-full max-w-4xl bg-graphite border border-white/10 rounded-3xl overflow-hidden shadow-2xl z-10 flex flex-col my-auto max-h-[92vh]"
                     >
+                        {/* Close Button */}
+                        <button
+                            onClick={onClose}
+                            className="absolute top-5 right-5 z-30 p-2 rounded-full bg-white/5 hover:bg-white/10 text-off-white/70 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X size={20} />
+                        </button>
+
                         {success ? (
-                            <div className="p-12 md:p-20 text-center flex flex-col items-center gap-6">
+                            <div className="p-12 md:p-20 text-center flex flex-col items-center justify-center gap-6">
                                 <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="w-16 h-16 md:w-20 md:h-20 bg-accent rounded-full flex items-center justify-center text-primary"
+                                    className="w-20 h-20 bg-accent rounded-full flex items-center justify-center text-primary shadow-xl shadow-accent/20"
                                 >
-                                    <CheckCircle2 size={32} md={40} />
+                                    <CheckCircle2 size={42} />
                                 </motion.div>
-                                <h2 className="text-2xl md:text-3xl font-black">Request Sent!</h2>
-                                <p className="text-sm md:text-base text-off-white/40">We'll get back to you with a professional quote shortly.</p>
+                                <h2 className="text-3xl font-black text-white">Enquiry Received!</h2>
+                                <p className="text-base text-off-white/70 max-w-md">
+                                    Thank you, <span className="text-accent font-bold">{name || 'there'}</span>. Our technical sales team will review your requirement and reach out with a detailed quote shortly.
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-accent font-mono bg-accent/10 px-4 py-2 rounded-xl">
+                                    <Sparkles size={14} />
+                                    <span>Direct WhatsApp Hotline: 07586 352447</span>
+                                </div>
                             </div>
                         ) : (
-                            <>
-                                <div className="flex justify-between items-center p-6 md:p-8 border-b border-white/5 shrink-0">
-                                    <h2 className="text-xl md:text-2xl font-black tracking-tight">Request a <span className="text-accent">Quote</span></h2>
-                                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors"><X size={20} md={24} /></button>
+                            <div className="grid grid-cols-1 md:grid-cols-12 overflow-y-auto custom-scrollbar">
+                                {/* Left Visual Column */}
+                                <div className="md:col-span-5 bg-gradient-to-b from-primary/90 via-graphite/60 to-primary/95 p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/10 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-full bg-accent/5 pointer-events-none" />
+
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/30 text-accent text-[10px] font-black uppercase tracking-widest mb-4">
+                                            <Shield size={12} />
+                                            Datanet Global Live Quote
+                                        </div>
+                                        <h3 className="text-2xl font-black text-white leading-tight">
+                                            {previewTitle}
+                                        </h3>
+                                        <p className="text-xs text-off-white/60 mt-2 leading-relaxed">
+                                            Let us know your requirement, and get tailored quotes and verified hardware from certified Datanet engineers!
+                                        </p>
+                                    </div>
+
+                                    {/* Product Visual Centerpiece */}
+                                    <div className="my-6 aspect-[4/3] rounded-2xl overflow-hidden bg-primary/70 border border-white/10 p-4 flex items-center justify-center relative group">
+                                        <img
+                                            src={previewImage}
+                                            alt="Enquiry Preview"
+                                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => { e.target.src = '/images/cctv.png'; }}
+                                        />
+                                    </div>
+
+                                    {/* Guarantees Box */}
+                                    <div className="space-y-2 pt-2 border-t border-white/5 text-[11px] text-off-white/70">
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle2 size={13} className="text-accent shrink-0" />
+                                            <span>UK-Wide Dispatch & Professional Installation</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle2 size={13} className="text-accent shrink-0" />
+                                            <span>Full Warranty & Ongoing Maintenance</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">Full Name</label>
-                                            <input
-                                                required
-                                                type="text"
-                                                className="form-input"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">Email Address</label>
-                                            <input
-                                                required
-                                                type="email"
-                                                className="form-input"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            />
-                                        </div>
+                                {/* Right Form Column */}
+                                <div className="md:col-span-7 p-8 md:p-10 flex flex-col justify-center" ref={suggestionsRef}>
+                                    <div className="mb-6">
+                                        <h2 className="text-xl md:text-2xl font-black text-white">
+                                            Quick <span className="text-gradient-gold">Enquiry</span> Form
+                                        </h2>
+                                        <p className="text-xs text-off-white/50 mt-1">
+                                            Fill out your specs below for an instant official estimate.
+                                        </p>
                                     </div>
 
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">Phone (Optional)</label>
-                                            <input
-                                                type="text"
-                                                className="form-input"
-                                                value={formData.phone}
-                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-accent">Service</label>
-                                            <select
-                                                required
-                                                className="form-input appearance-none bg-primary"
-                                                value={formData.service}
-                                                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                                            >
-                                                <option value="">Select Service</option>
-                                                <option>IT & Network Solutions</option>
-                                                <option>Security & CCTV</option>
-                                                <option>Managed Services</option>
-                                                <option>System Repair</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                    <form onSubmit={handleSubmit} className="space-y-4">
+                                        {/* Product / Service Name (with Autocomplete) */}
+                                        <div className="relative">
+                                            <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
+                                                Enter Product/Service name <span className="text-red-400">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    required
+                                                    type="text"
+                                                    value={productName}
+                                                    onChange={(e) => {
+                                                        setProductName(e.target.value);
+                                                        setIsSuggestionsOpen(true);
+                                                    }}
+                                                    onFocus={() => setIsSuggestionsOpen(true)}
+                                                    placeholder="e.g. CCTV System, Laptop Fleet, WiFi Setup..."
+                                                    className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl px-4 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
+                                                />
+                                                <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none" />
+                                            </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-accent">Budget Range</label>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. $5k - $10k"
-                                            className="form-input"
-                                            value={formData.budget}
-                                            onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-accent">Project Details</label>
-                                        <textarea
-                                            required
-                                            rows="4"
-                                            className="form-input resize-none"
-                                            value={formData.message}
-                                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div className="pt-4">
-                                        <Magnetic strength={0.05}>
-                                            <button
-                                                disabled={loading}
-                                                className="btn-primary w-full group flex items-center justify-center gap-4 py-5"
-                                            >
-                                                {loading ? 'Processing...' : (
-                                                    <>
-                                                        Submit Request
-                                                        <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                                    </>
+                                            {/* Autocomplete Suggestions Dropdown */}
+                                            <AnimatePresence>
+                                                {isSuggestionsOpen && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: -5 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: -5 }}
+                                                        className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-graphite border border-white/15 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scrollbar p-1"
+                                                    >
+                                                        {filteredSuggestions.map((item, index) => (
+                                                            <button
+                                                                key={index}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setProductName(item);
+                                                                    setIsSuggestionsOpen(false);
+                                                                }}
+                                                                className="w-full text-left px-3.5 py-2 rounded-lg text-xs text-off-white/80 hover:text-white hover:bg-accent/15 hover:border-accent/30 transition-colors flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <Search size={12} className="text-accent/70 shrink-0" />
+                                                                <span className="capitalize">{item}</span>
+                                                            </button>
+                                                        ))}
+                                                    </motion.div>
                                                 )}
-                                            </button>
-                                        </Magnetic>
-                                    </div>
-                                </form>
-                            </>
+                                            </AnimatePresence>
+                                        </div>
+
+                                        {/* Email Address */}
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
+                                                Email ID <span className="text-red-400">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none">
+                                                    <Mail size={14} />
+                                                </div>
+                                                <input
+                                                    required
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="Enter your Email"
+                                                    className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl pl-10 pr-4 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Country Selector & Full Name */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {/* Country */}
+                                            <div className="relative">
+                                                <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5 flex items-center gap-1">
+                                                    <Globe size={11} className="text-accent" />
+                                                    Your Country is:
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
+                                                    className="w-full bg-primary/80 border border-white/15 hover:border-accent/40 rounded-xl px-3.5 py-3 text-xs text-off-white flex items-center justify-between transition-colors cursor-pointer"
+                                                >
+                                                    <span className="flex items-center gap-2">
+                                                        <span>{selectedCountry.flag}</span>
+                                                        <span className="truncate">{selectedCountry.name}</span>
+                                                    </span>
+                                                    <ChevronDown size={14} className="text-off-white/50 shrink-0" />
+                                                </button>
+
+                                                {/* Country Dropdown */}
+                                                {isCountryDropdownOpen && (
+                                                    <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-graphite border border-white/15 rounded-xl shadow-2xl p-1 max-h-40 overflow-y-auto custom-scrollbar">
+                                                        {countries.map(c => (
+                                                            <button
+                                                                key={c.code}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setSelectedCountry(c);
+                                                                    setIsCountryDropdownOpen(false);
+                                                                }}
+                                                                className="w-full text-left px-3 py-1.5 rounded-lg text-xs text-off-white hover:bg-accent/15 hover:text-white flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <span>{c.flag}</span>
+                                                                <span>{c.name}</span>
+                                                                <span className="text-[10px] text-off-white/40 ml-auto font-mono">{c.prefix}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Name */}
+                                            <div>
+                                                <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
+                                                    Name <span className="text-red-400">*</span>
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none">
+                                                        <User size={14} />
+                                                    </div>
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={(e) => setName(e.target.value)}
+                                                        placeholder="Your Name"
+                                                        className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl pl-10 pr-4 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Phone Number (Optional) */}
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
+                                                Phone Number (Optional for WhatsApp dispatch)
+                                            </label>
+                                            <div className="relative">
+                                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-off-white/40 pointer-events-none">
+                                                    <Phone size={14} />
+                                                </div>
+                                                <input
+                                                    type="tel"
+                                                    value={phone}
+                                                    onChange={(e) => setPhone(e.target.value)}
+                                                    placeholder={`${selectedCountry.prefix} 7586 352447`}
+                                                    className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl pl-10 pr-4 py-3 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Additional Notes (Optional) */}
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-wider text-off-white/60 mb-1.5">
+                                                Requirement Details (Quantity, location, or specs)
+                                            </label>
+                                            <textarea
+                                                rows="2"
+                                                value={additionalNotes}
+                                                onChange={(e) => setAdditionalNotes(e.target.value)}
+                                                placeholder="e.g. 4 cameras for retail store in Newcastle, or 10 Dell laptops..."
+                                                className="w-full bg-primary/80 border border-white/15 focus:border-accent rounded-xl px-4 py-2.5 text-xs text-off-white placeholder:text-off-white/30 focus:outline-none resize-none transition-colors"
+                                            />
+                                        </div>
+
+                                        {/* Terms Agreement */}
+                                        <div className="flex items-center gap-2 pt-1">
+                                            <input
+                                                type="checkbox"
+                                                id="agreeTerms"
+                                                checked={agreedToTerms}
+                                                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                                className="rounded border-white/20 text-accent focus:ring-accent cursor-pointer accent-amber-500"
+                                            />
+                                            <label htmlFor="agreeTerms" className="text-[11px] text-off-white/60 cursor-pointer select-none">
+                                                I agree to the <Link to="/terms" onClick={onClose} className="text-accent underline hover:text-accent-light">terms</Link> and <Link to="/privacy" onClick={onClose} className="text-accent underline hover:text-accent-light">privacy policy</Link>
+                                            </label>
+                                        </div>
+
+                                        {/* Submit Button ("Go >") */}
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 cursor-pointer disabled:opacity-50"
+                                        >
+                                            {loading ? (
+                                                <span>Submitting to Datanet...</span>
+                                            ) : (
+                                                <>
+                                                    <span>Go</span>
+                                                    <Send size={15} />
+                                                </>
+                                            )}
+                                        </button>
+
+                                        {/* OR Divider */}
+                                        <div className="relative flex py-2 items-center">
+                                            <div className="flex-grow border-t border-white/10"></div>
+                                            <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest text-off-white/40">OR</span>
+                                            <div className="flex-grow border-t border-white/10"></div>
+                                        </div>
+
+                                        {/* WhatsApp Direct Option */}
+                                        <button
+                                            type="button"
+                                            onClick={handleWhatsAppSubmit}
+                                            className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-off-white hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+                                        >
+                                            <MessageCircle size={15} className="text-emerald-400" />
+                                            <span>Send Enquiry Directly via WhatsApp</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         )}
                     </motion.div>
                 </div>

@@ -19,26 +19,33 @@ const Navbar = ({ onGetStarted }) => {
     }, []);
 
     const navLinks = [
+        { name: 'Store', href: '/sales', isRoute: true },
         { name: 'About', href: '#about' },
         { name: 'Services', href: '#services' },
         { name: 'Work', href: '#work' },
         { name: 'Contact', href: '#contact' },
     ];
 
-    const handleNavClick = (e, href) => {
+    const handleNavClick = (e, link) => {
         e.preventDefault();
         setMobileMenuOpen(false);
+
+        if (link.isRoute) {
+            navigate(link.href);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
 
         if (location.pathname !== '/') {
             navigate('/');
             setTimeout(() => {
-                const element = document.querySelector(href);
+                const element = document.querySelector(link.href);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });
                 }
             }, 100);
         } else {
-            const element = document.querySelector(href);
+            const element = document.querySelector(link.href);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
@@ -87,7 +94,7 @@ const Navbar = ({ onGetStarted }) => {
                         <motion.a
                             key={link.name}
                             href={link.href}
-                            onClick={(e) => handleNavClick(e, link.href)}
+                            onClick={(e) => handleNavClick(e, link)}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
@@ -131,7 +138,7 @@ const Navbar = ({ onGetStarted }) => {
                                     key={link.name}
                                     href={link.href}
                                     className="text-lg font-medium tracking-widest uppercase"
-                                    onClick={(e) => handleNavClick(e, link.href)}
+                                    onClick={(e) => handleNavClick(e, link)}
                                 >
                                     {link.name}
                                 </a>

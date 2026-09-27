@@ -369,11 +369,11 @@ const AdminDashboard = () => {
 
                 {activeTab === 'submissions' && (
                     <div className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-12">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-12">
                             {[
                                 { label: 'Total Requests', val: submissions.length },
-                                { label: 'Quotes', val: submissions.filter(s => s.type === 'quote').length },
-                                { label: 'General', val: submissions.filter(s => s.type === 'contact').length }
+                                { label: 'Enquiries & Quotes', val: submissions.filter(s => s.type === 'quote' || s.type === 'enquiry').length },
+                                { label: 'Contact Messages', val: submissions.filter(s => s.type === 'contact').length }
                             ].map(stat => (
                                 <div key={stat.label} className="bg-graphite p-6 rounded-2xl border border-white/5">
                                     <p className="text-[10px] uppercase font-black tracking-widest text-accent mb-2">{stat.label}</p>
@@ -388,33 +388,55 @@ const AdminDashboard = () => {
                                     <thead className="bg-black/20 text-[10px] font-black uppercase tracking-[0.2em] text-off-white/30">
                                         <tr>
                                             <th className="p-6">Type</th>
-                                            <th className="p-6">Name</th>
-                                            <th className="p-6">Email / Phone</th>
-                                            <th className="p-6">Service / Budget</th>
-                                            <th className="p-6">Project Details</th>
+                                            <th className="p-6">Client Name & Org</th>
+                                            <th className="p-6">Contact Info</th>
+                                            <th className="p-6">Service / Requirement</th>
+                                            <th className="p-6">Location & Scope</th>
+                                            <th className="p-6">Details / Notes</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
                                         {submissions.map(sub => (
                                             <tr key={sub.id} className="hover:bg-white/[0.02] transition-colors">
                                                 <td className="p-6">
-                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${sub.type === 'quote' ? 'bg-accent/20 text-accent' : 'bg-blue-500/20 text-blue-400'
-                                                        }`}>
-                                                        {sub.type}
+                                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                                                        sub.type === 'enquiry'
+                                                            ? 'bg-emerald-500/20 text-emerald-400'
+                                                            : sub.type === 'quote'
+                                                            ? 'bg-accent/20 text-accent'
+                                                            : 'bg-blue-500/20 text-blue-400'
+                                                    }`}>
+                                                        {sub.type || 'Inquiry'}
                                                     </span>
                                                 </td>
-                                                <td className="p-6 font-bold">{sub.name}</td>
                                                 <td className="p-6">
-                                                    <div className="text-sm">{sub.email}</div>
-                                                    <div className="text-xs text-off-white/20">{sub.phone || 'N/A'}</div>
+                                                    <div className="font-bold text-white">{sub.name || 'Anonymous'}</div>
+                                                    <div className="text-xs text-off-white/40">{sub.company || sub.country || 'United Kingdom'}</div>
                                                 </td>
                                                 <td className="p-6">
-                                                    <div className="text-sm text-accent font-medium">{sub.service || 'General Inquiry'}</div>
-                                                    <div className="text-[10px] text-off-white/40">{sub.budget || '-'}</div>
+                                                    <div className="text-sm text-off-white">{sub.email}</div>
+                                                    <div className="text-xs font-mono text-accent/80">{sub.phone || 'No phone'}</div>
                                                 </td>
                                                 <td className="p-6">
-                                                    <p className="text-xs text-off-white/60 max-w-xs line-clamp-2 hover:line-clamp-none transition-all cursor-pointer">
-                                                        {sub.message}
+                                                    <div className="text-sm text-accent font-medium">
+                                                        {sub.product_service || sub.service || 'General Service'}
+                                                    </div>
+                                                    {sub.budget && (
+                                                        <div className="text-[10px] text-off-white/40 font-mono">Budget: {sub.budget}</div>
+                                                    )}
+                                                </td>
+                                                <td className="p-6">
+                                                    <div className="text-xs text-white">{sub.location || sub.country || 'UK'}</div>
+                                                    {sub.scope && (
+                                                        <div className="text-[10px] text-off-white/50">{sub.scope}</div>
+                                                    )}
+                                                    {sub.timeline && (
+                                                        <div className="text-[10px] text-accent/70">{sub.timeline}</div>
+                                                    )}
+                                                </td>
+                                                <td className="p-6">
+                                                    <p className="text-xs text-off-white/70 max-w-xs line-clamp-3 hover:line-clamp-none transition-all cursor-pointer">
+                                                        {sub.message || sub.notes || 'No extra message provided'}
                                                     </p>
                                                 </td>
                                             </tr>
